@@ -1,0 +1,479 @@
+----------------NOTES------SUBJECT----------FRACT'OL------------
+
+|| Error handdling in C  - detect and respond to problems in my program ||
+
+perror() function - prints a custom error message -> followed by a
+description of the last error that occurred
+
+errno - global variable that stores the error code from the last failed operation
+__Used after a system or library function returns an error__
+
+To access errno you have to include <errno.h> library, then strerror(errno) 
+function will convert the error code into a readable message
+
+exit() function allows you to stop the program immediately when an error occurs
+
+0 helps signal that the program finished succesfully 
+1 that signal that the program finished with an error
+
+----------------------------------------------------------------------------------
+
+We are allowed to use <math.h>, this library allow to do a lot of 
+mathematical operations.
+----------------------------------------------------------------------------------
+
+We are allowed to use all the functions of the MiniLibX library, it provides -->
+__simple window creation
+__a drawing tools
+__image functions
+__event management system
+
+In order to use MiniLibX, you have to dowloand it zip file from 
+the project profile. Then, run ./configure. Include a few dependencies in Makefile.
+
+----------------------------------------------------------------------------------
+
+DESCRIPTION
+       The gettimeofday() function shall obtain the current time,
+       expressed as seconds and microseconds since the Epoch, and store
+       it in the timeval structure pointed to by tp.  The resolution of
+       the system clock is unspecified.
+
+       If tzp is not a null pointer, the behavior is unspecified.
+RETURN VALUE
+       The gettimeofday() function shall return 0 and no value shall be
+       reserved to indicate an error.
+
+----------------------------------------------------------------------------------
+
+We are allowed to use ft_printf and most probably other functions from our libft
+
+--------------------------REQUIREMENTS AND RULES----------------------------------
+
+◦ Julia set and Mandelbrot set
+◦ mouse wheel allows zooming in and out almost infinitely
+◦ opportunity to create different Julia sets by passing different parameters
+◦ A parameter is passed on the command line to define what type of fractal will be
+	displayed in a window.
+	__You can handle more parameters to use them as rendering options.
+	__If no parameter is provided, or if the parameter is invalid, the program 
+              displays a list of available parameters and exits properly.
+• You must use at least a few colors to reveal the depth of each fractal.
+Experimenting with psychedelic effects is encouraged.
+
+-----------------------------GRAPHIC MANAGEMENT----------------------------------
+
+• The image should be displayied in a window
+• Window management must remain smooth
+• ESC mast close the window and quit the program in a clean way
+• Clicking on the cross on the window's frame must close the window and quit the
+program in a clean way, (same with ESC)
+• The use of the images of the mlx library is mandatory
+
+_________________________MiniLibX____creation of a window__etc.___________________
+
+First of all, mlx_init() - establishes the connection to the correct graphical
+system.
+
+The mlx_init function will create this connection. No parameters are needed, ant
+it will return a "void *" identifier, used for further calls to the library
+routines.
+
+All other MiniLibX functions are described in the following man pages:
+
+mlx_new_window --- manage windows
+
+mlx_pixel_put --- draw inside window
+
+mlx_new_image --- manipulate images
+
+mlx_loop --- handle keyboard or mouse events
+
+Event -- keyboard or mouse entries 
+
+When it catches an event, the MiniLibX calls the corresponding function
+with fixed parameters:
+
+  expose_hook(void *param);
+  key_hook(int keycode,void *param);
+  mouse_hook(int button,int x,int y,void *param);
+  loop_hook(void *param);
+
+__________MLX42___ANOTHER_MORE_POWERFUL_VERSION__to work with windows___________
+
+Making sure that MLX42 library is build:
+       cd include/MLX42
+       cmake -B build
+       cmake --build build -j4
+
+
+_______________________FRACT'OL THING/BUILDING/MEANING__________________________
+
+0x000000FF -- BLACK COLOUR
+
+a + bi
+(a) and (b) - real numbers
+(i) - i^2 = -1 - imaginary number
+
+Assosiate complex number (a + bi) to the f(z) = z^2 + c function
+
+Two options for f(z) = z^2 + c:
+1. Distance from 0 of the sequence get arbitary large. That means it blows up.
+2. Distance is bounced (never larger than 2)
+
+One definition of Mandelbrot Set - set of complex #'s c for which distance
+is bounced
+
+How to draw a picture whether (c) is in the Mandelbrot set or not. 
+Iterate 0 under z^2 + c , if it takes a long time to get big then you give it
+one color, if it gets big really quicly you can give it a different color.
+
+Mandelbrot set - it's a set of points C on the complex plane that doesn't
+escape when you repeatedly apply this formula. 
+
+3 + 2i actually means itself that the point is shifted 3 units to the right and
+2 units up. 
+
+A sequence diverges when it doesn’t settle down — when the values shoot off
+toward infinity instead of approaching a limit.
+
+Every point that never diverges (stays bounded/never goes to infinity) is part
+of the Mandelbost set - it's therefore colored black.
+
+__________________ARRANGMENT__OF__FILES__IN_THE__REPOSITORY____________________
+
+________events.c - responsible for:
+
+1.• ESC mast close the window and quit the program in a clean way;
+2.• Clicking on the cross on the window's frame must close the window and quit the
+program in a clean way, (same with ESC);
+3.◦ mouse wheel allows zooming in and out almost infinitely.
+
+________init.c - responsible for:
+
+1. Initialising the MLX42 instance (mlx_init);
+2. Creating the image buffer (mlx_new_image);
+3. Setting initial values (zoom, offsets, max_terations);
+4. Attaching the image to the window (mlx_image_to_window);
+5. Handling errors properly.
+
+________mandelbrot.c - responsoble for:
+
+1. Containing all the mathematical logic behind this set;
+2. Implementing the iteration loop;
+3. Returning how many iterations it took for z to escape (used for coloring).
+
+________draw.c - responsible for:
+
+1. Loooking over all pixels (x, y) on the screen;
+2. Converting each pixel coordinate to a complex number;
+3. Running the Mandelbrot iteration and getting the iteration count;
+4. Choosing a color based on that count;
+5. Writing the image to the emage buffer.
+
+________main.c - responsible for:
+
+1. Parsing command line arguments;
+2. Calling initialisation functions (creating MLX, image);
+3. Reistering event hooks (keyboard, mouse, close button);
+4. Starting the main loop (mlx_loop);
+5. Cleaning up memory when the program exicts.
+
+-------------------------------------------------------------------------------
+
+void	check_set(t_fractal *fract, char *set)
+{
+	if (ft_strncmp(set, "mandelbrot", 10) == 0)
+		draw_mandelbrot(fract);
+	else if (ft_strncmp(set, "julia", 5) == 0)
+		draw_julia(fract);
+	else
+		exit_w_error(fract);
+}
+-------------------------------------------------------------------------------
+
+___________________zooming in and out the fractal_____________
+
+We want the point under mouse before zoom to stay the same after zoom,
+so we adjust the offset to compensate.
+
+x - pixel position of your mouse from the left edge of the window
+y - pixel position of your mouse from the top edge of the window
+
+(x / fractal->zoom) - converts pixel into complex-plane units
+
+(x / fractal->zoom + fractal->offset_x) - the point in the complex plane that
+corresponds to the mouse's current pixel
+
+(x / (zoom * zoom_level)) - how much the coordinate under your mouse would shift
+because zoom made each pixel smaller
+###############################################################################
+/** 
+ * Returns the current, relative, mouse cursor position on the window, starting
+ * from the top left corner.
+ * 
+ * Negative values or values greater than window width or height 
+ * indicate that it is outside the window.
+ * 
+ * @param[in] mlx The MLX instance handle. 
+ * @param[out] x The position.
+ * @param[out] y The position.
+ */
+void mlx_get_mouse_pos(mlx_t* mlx, int32_t* x, int32_t* y);
+##############################################################################
+/** 
+ * Draws a new instance of an image, it will then share the same
+ * pixel buffer as the image.
+ * 
+ * NOTE: Keep in mind that the instance array gets reallocated, try
+ * to store the return value to the instance! 
+ * NOT the pointer! It will become invalid!
+ * 
+ * WARNING: Try to display as few images on the window as possible,
+ * drawing too many images will cause a loss in performance!
+ * 
+ * @param[in] mlx The MLX instance handle.
+ * @param[in] img The image to draw on the screen.
+ * @param[in] x The X position.
+ * @param[in] y The Y position.
+ * @return Index to the instance, or -1 on failure.
+ */
+int32_t mlx_image_to_window(mlx_t* mlx, mlx_image_t* img, int32_t x, int32_t y);
+################################################################################
+/**
+ * Changes the window size to the newly specified values.
+ * Use this to update the window width and height values in the mlx handle.
+ * 
+ * @param[in] mlx The MLX instance handle.
+ * @param[in] new_width The new desired width.
+ * @param[in] new_height The new desired height.
+ */
+void mlx_set_window_size(mlx_t* mlx, int32_t new_width, int32_t new_height);
+################################################################################
+/**
+ * Sets the size limits of the specified window.
+ * Will force the window to not be resizable past or below the given values.
+ * 
+ * Pass -1 for no limit to any of the min/max parameters to ignore that boundary.
+ * For instance if you want a min window size but the max window size can be whatever.
+ *
+ * @param[in] mlx The MLX instance handle.
+ * @param[in] min_w The min width of the window.
+ * @param[in] max_w The max width of the window.
+ * @param[in] min_h The min height of the window.
+ * @param[in] max_h The max height of the window.
+ */
+void mlx_set_window_limit(mlx_t* mlx, int32_t min_w, int32_t min_h, int32_t max_w, int32_t max_h);
+#################################################################################
+/**
+ * Allows you to resize an image, a new pixel buffer is allocated
+ * to fit & the previous data is scaled to fit the new size.
+ * 
+ * @param[in] img The image to resize.
+ * @param[in] nwidth The new width.
+ * @param[in] nheight The new height.
+ * @return True if image was resized or false on error.
+ */
+bool mlx_resize_image(mlx_image_t* img, uint32_t nwidth, uint32_t nheight);
+################################################################################
+/**
+ * Deleting an image will remove it from the render queue as well as any and all
+ * instances it might have. Additionally, just as extra measures sets all the
+ * data to NULL.
+ * 
+ * If you simply wish to stop rendering an image without de-allocation
+ * set the 'enabled' boolean in the image struct.
+ * 
+ * @param[in] mlx The MLX instance handle.
+ * @param[in] image The image to delete.
+ */
+void mlx_delete_image(mlx_t* mlx, mlx_image_t* image);
+################################################################################
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+______________________________MANDELBROT__SET___________________________________
+
+Mandelbrot fractol is an escape-time fractal. The system that recursively iterate
+over the input and try to find if the result stays within some bound (does not
+escape in some certain number of iterations).
+
+In order us to have more than just 2 colours for the fractal, we would need to use 
+the numebr of iterations a point went through before escaping the set.
+
+i^2 = -1
+
+The higher the maximal number of iterations, the more detail and subtlety emerge in
+the final image, but the longer time it will take to calculate the fractal image.
+
+We stop iterations (detecting escapes) by determining the absolute value, or modulus, 
+of the complex number. If this value, exceeds 2, or equivalently, when the sum of
+squares of the real and imaginary parts exceed 4, the point has reached escape.
+
+Escape_check = fractol->z_real * fractol->z_real + fractol->z_img * fractol->z_img;
+
+Calculating the iteration counts associated with each pixel stores in
+array: IterationCounts[x][y], where x and y are coordinates of a pixel in the window
+respectively. 
+
+#define BASE_R 27
+#define BASE_G 219
+#define BASE_B 226
+#define BASE_A 255  // or 204 for 0.8 opacity
+
+if (i == fractal->max_iterations)
+{
+    // Inside the set — black
+    put_color_to_pixel(fractal, x, y, 0x000000FF);
+}
+else
+{
+    // Compute a brightness factor between 0.3 and 1.0
+    double t = (double)i / fractal->max_iterations; // 0 → far away, 1 → near boundary
+    double brightness = 0.3 + 0.7 * t; // never fully black, never overbright
+
+    uint8_t r = (uint8_t)(BASE_R * brightness);
+    uint8_t g = (uint8_t)(BASE_G * brightness);
+    uint8_t b = (uint8_t)(BASE_B * brightness);
+    uint8_t a = BASE_A;
+
+    uint32_t color = (r << 24) | (g << 16) | (b << 8) | a;
+    put_color_to_pixel(fractal, x, y, color);
+}
+
+if the pixel escapes really instantly -> t near 0
+If the pixel survives almost to the end -> t near 1
+
+________SQUARE OF A COMPLEX NUMBER FORMULA___________
+
+(x + yi)^2 = (x + yi) * (x + yi) = x^2 + xyi + xyi + y^2i^2 = x^2 +2xyi - y^2
+OR
+x^2 - y^2 + 2xyi
+
+x^2 - y^2 - real number
+2xyi - imaginary part
+
+_____________________________________________________
+
+mlx_put_pixel(img, 0, 0, 0x000000FF); - ?????
+
+    // Draw the image at coordinate (0, 0).
+    mlx_image_to_window(mlx, img, 0, 0);
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$_____JULIA SETS_______$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+c = −0.8 + 0.156i
+c = −0.7269 + 0.1889i
+c = -0.8i
+c = 0.35 + 0.35i
+c = 0.4 + 0.4i
+
+H_CASES_____H_CASES____H_CASES____H_CASES_______H_CASES__________________________
+
+
+
+---------------------------------------------------------------------------------
+
+________________________10th of October__________________________________________
+I have wrote a brief explanation for each file
+
+________________________11th of October__________________________________________
+I have wrote initialising file, structured main file, and implemented the closing
+of the window
+
+________________________12th of October__________________________________________
+I have done zooming in and zooming out architecture, tomorrow, I need to do
+recising of the window, and I want to write a math part of the project finally.
+
+________________________13th of October__________________________________________
+Finished the events part, the only thing that left, is programming fractol, and
+draw it
+
+________________________14th of October__________________________________________
+Programmed the Fractol, figure out the math part. Draw it. Tomorrow needs to
+solve problems with minimising the window. With a colouring scheme. Maybe write
+math for Julia set. Oh, yeah, maybe do another set first. And than do beautiful
+part on Thursday.
+
+________________________15th of October__________________________________________
+Just wrote math for Julia set, nothing works. Need to figure out the way that
+user will give comples number as an argument in the command line
+
+________________________16th of October__________________________________________
+Such a day full of misunderstanding, but finally using all my brain cells and AI,
+Google. Now I can recise everything. So, when I first found the 
+mlx_resize_hook() in a documents, it said that the function is called every frame 
+during which the window is being resized.
+
+/**
+ * Callback function used to handle window resizing.
+ * 
+ * WARNING: The function is called every frame during which the window is being
+ * resized, be aware!
+ * 
+ * @param[in] width The new width of the window.
+ * @param[in] height The new height of the window. 
+ * @param[in] param Additional parameter to pass on to the function.
+ */
+typedef void (*mlx_resizefunc)(int32_t width, int32_t height, void* param);
+
+It especially means, that I was trying to redraw the image, every time the user were
+maximising/minimising the window even by millimeters. 
+
+1. My own implemented resize_function used to just create a new image, and a new
+window with proper dimensions, once it done do [2].
+
+2. The loop_hook function is in charge of drawing a fractol, only when it needed
+with proper dimeons once.
+
+________________________17th of October__________________________________________
+The plan is finish with colours, I need at least one more, I want to do like the
+star colour, I would implement it like using keys, for example number 1 will be - 
+sky blue, 2 - gold star. Something like this. Want to play with colours futhermore
+
+Maybe do some other fractol. We will see. I spend already a lot of time on this project.
+
+# define BASE_R 10
+# define BASE_G 180
+# define BASE_B 190
+# define BASE_A 255  --- for the blue colour
+
+# define BASE_R 242
+# define BASE_G 204
+# define BASE_B 15
+# define BASE_A 255  --- for the golden colour
+
+If the user is clicking on G Key - he wants the colour to be golden
+If the user is clicking on B Key - he wants the colour to be blue
+
+	if (keydata.key == MLX_KEY_G && keydata.action == MLX_PRESS)
+		which_colour(fractol, "G");
+	if (keydata.key == MLX_KEY_B && keydata.action == MLX_PRESS)
+		which_colour(fractol, "B");
+
+_________________OLD____VERSION___OF___COLOR_____SCHEME_____________________________
+
+// static void	which_colour(t_fractol *fractol, int i)
+// {
+// 	double		t;
+// 	uint8_t		r;
+// 	uint8_t		g;
+// 	uint8_t		b;
+// 	uint8_t		a;
+
+// 	if (i == fractol->max_iterations)
+// 	{
+// 		mlx_put_pixel(fractol->image, fractol->x, fractol->y, 0x000000FF);
+// 	}
+// 	else
+// 	{
+// 		t = (double)i / fractol->max_iterations;
+// 		t = pow(t, 0.6);
+// 		fractol->brightness = 0.1 + 1.2 * t;
+// 		r = (uint8_t)(BASE_R * fractol->brightness);
+// 		g = (uint8_t)(BASE_G * fractol->brightness);
+// 		b = (uint8_t)(BASE_B * fractol->brightness);
+// 		a = BASE_A;
+// 		fractol->color = (r << 24) | (g << 16) | (b << 8) | a;
+// 		mlx_put_pixel(fractol->image, fractol->x, fractol->y, fractol->color);
+// 	}
+// }
