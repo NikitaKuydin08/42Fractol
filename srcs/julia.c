@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 12:18:16 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/17 23:54:08 by nkuydin          ###   ########.fr       */
+/*   Updated: 2025/10/18 23:56:52 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,17 @@ void	calculate_julia(t_fractol *fractol)
 	double	tmp_real;
 
 	n = 0;
-	fractol->z_real = (fractol->x / fractol->zoom) + fractol->offset_x;
-	fractol->z_img = (fractol->y / fractol->zoom) + fractol->offset_y;
+	fractol->z.real = (fractol->x / fractol->zoom) + fractol->offset_x;
+	fractol->z.img = (fractol->y / fractol->zoom) + fractol->offset_y;
 	while (++n < fractol->max_iterations)
 	{
-		tmp_real = (fractol->z_real * fractol->z_real)
-			- (fractol->z_img * fractol->z_img);
-		fractol->z_img = 2.0 * fractol->z_real * fractol->z_img;
-		fractol->z_real = tmp_real + fractol->c_real;
-		fractol->z_img += fractol->c_img;
-		if ((fractol->z_real * fractol->z_real
-				+ fractol->z_img * fractol->z_img) > 4)
+		tmp_real = (fractol->z.real * fractol->z.real)
+			- (fractol->z.img * fractol->z.img);
+		fractol->z.img = 2.0 * fractol->z.real * fractol->z.img;
+		fractol->z.real = tmp_real + fractol->jc.real;
+		fractol->z.img += fractol->jc.img;
+		if ((fractol->z.real * fractol->z.real
+				+ fractol->z.img * fractol->z.img) > 4)
 			break ;
 	}
 	if (n == fractol->max_iterations)
@@ -57,4 +57,18 @@ static void	calculation_colour(t_fractol *fractol, int i)
 	fractol->color = (r << 24) | (g << 16) | (b << 8)
 		| a;
 	mlx_put_pixel(fractol->image, fractol->x, fractol->y, fractol->color);
+}
+
+void	check_jc(t_fractol	*fractol)
+{
+	if (fractol->param1 && fractol->param2)
+	{
+		fractol->jc.real = fractol->param1;
+		fractol->jc.img = fractol->param2;
+	}
+	else
+	{
+		fractol->jc.real = -0.7;
+		fractol->jc.real = 0.27015;
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 20:38:10 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/17 23:53:31 by nkuydin          ###   ########.fr       */
+/*   Updated: 2025/10/19 00:49:14 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ void	loop_hook(void *param)
 		draw_fractol(fractol);
 		fractol->needs_redraw = 0;
 	}
+	if (fractol->animation == 1)
+		animation(fractol);
 }
 
 void	key_hook(mlx_key_data_t keydata, void *param)
@@ -34,26 +36,26 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 	t_fractol	*fractol;
 
 	fractol = (t_fractol *)param;
-	if (keydata.key == MLX_KEY_R && keydata.action == MLX_PRESS)
+	if (keydata.key == 82 && keydata.action == 1)
 		reset_fractol(fractol);
-	if (keydata.key == MLX_KEY_ESCAPE && keydata.action == MLX_PRESS)
+	if (keydata.key == 256 && keydata.action == 1)
 		mlx_close_window(fractol->mlx);
-	if (keydata.key == MLX_KEY_UP && (keydata.action == MLX_REPEAT
-			|| keydata.action == MLX_PRESS))
+	if (keydata.key == 265 && (keydata.action == 2 || keydata.action == 1))
 		fractol->offset_y -= 0.0005 * fractol->zoom;
-	if (keydata.key == MLX_KEY_DOWN && (keydata.action == MLX_REPEAT
-			|| keydata.action == MLX_PRESS))
+	if (keydata.key == 264 && (keydata.action == 2 || keydata.action == 1))
 		fractol->offset_y += 0.0005 * fractol->zoom;
-	if (keydata.key == MLX_KEY_LEFT && (keydata.action == MLX_REPEAT
-			|| keydata.action == MLX_PRESS))
+	if (keydata.key == 263 && (keydata.action == 2 || keydata.action == 1))
 		fractol->offset_x -= 0.0005 * fractol->zoom;
-	if (keydata.key == MLX_KEY_RIGHT && (keydata.action == MLX_REPEAT
-			|| keydata.action == MLX_PRESS))
+	if (keydata.key == 262 && (keydata.action == 2 || keydata.action == 1))
 		fractol->offset_x += 0.0005 * fractol->zoom;
-	if (keydata.key == MLX_KEY_G && keydata.action == MLX_PRESS)
-		which_colour(fractol, 'G');
-	if (keydata.key == MLX_KEY_B && keydata.action == MLX_PRESS)
-		which_colour(fractol, 'B');
+	if (keydata.key == 67 && (keydata.action == 2 || keydata.action == 1))
+		change_color(fractol);
+	if (keydata.key == 66 && keydata.action == 1)
+		
+	if (keydata.key == 70 && keydata.action == 1)
+		switch_fractol(fractol);
+	if (keydata.key == 65 && keydata.action == 1)
+		fractol->animation *= -1;
 	fractol->needs_redraw = 1;
 }
 

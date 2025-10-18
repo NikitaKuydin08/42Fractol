@@ -6,7 +6,7 @@
 #    By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/03 16:21:44 by nkuydin           #+#    #+#              #
-#    Updated: 2025/10/16 16:00:06 by nkuydin          ###   ########.fr        #
+#    Updated: 2025/10/19 00:26:39 by nkuydin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 MLX_DIR = ./includes/MLX42
 LIBFT_DIR = ./includes/42Libft
+OBJ_DIR = objects
 
 HEADERS = -I ${MLX_DIR}/include -I ${LIBFT_DIR}
 LIBS = ${MLX_DIR}/build/libmlx42.a ${LIBFT_DIR}/libft.a -ldl -lglfw -pthread -lm
@@ -25,33 +26,47 @@ SRCS = srcs/main.c \
 		srcs/init.c \
 		srcs/mandelbrot.c \
 		srcs/julia.c \
+		srcs/ship.c \
 		srcs/help.c \
+		srcs/color.c
 
-OBJS = ${SRCS:.c=.o}
+OBJS = $(patsubst srcs/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-all : mlx libft ${NAME}
+# Default rule
+all: mlx libft ${NAME}
 
+${NAME}: ${OBJS}
+	${CC} ${CFLAGS} ${OBJS} ${LIBS} -o $@
+
+# Compile object files
+$(OBJ_DIR)/%.o: srcs/%.c | $(OBJ_DIR)
+	${CC} ${CFLAGS} ${HEADERS} -c $< -o $@
+
+# Ensure object directory exists
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+# Build libft
 libft:
 	@make -C ${LIBFT_DIR}
 
-mlx :
+# Build MLX42
+mlx:
 	@cmake -S ${MLX_DIR} -B ${MLX_DIR}/build
 	@cmake --build ${MLX_DIR}/build -j4
 
-.c.o:
-	${CC} ${CFLAGS} ${HEADERS} -c $< -o ${<:.c=.o}
+# Clean objects
+clean:
+	rm -rf ${OBJ_DIR}
+	@make -C ${LIBFT_DIR} clean
 
-${NAME} : ${OBJS}
-	${CC} ${OBJS} ${LIBS} -o $(NAME)
-
-clean :
-	rm -f ${OBJS}
-
-fclean : clean
+# Clean everything
+fclean: clean
 	rm -f ${NAME}
 	rm -rf ${MLX_DIR}/build
 	@make -C ${LIBFT_DIR} fclean
 
-re : fclean all
+# Rebuild
+re: fclean all
 
-.PHONY : all clean fclean re mlx
+.PHONY: all clean fclean re mlx libft

@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 20:38:22 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/16 17:37:30 by nkuydin          ###   ########.fr       */
+/*   Updated: 2025/10/19 00:44:11 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,54 +16,62 @@
 
 #include "../fractol.h"
 
-int	draw_fractol(t_fractol *fractol)
+int	draw_fractol(t_fractol *param)
 {
-	if (ft_strncmp(fractol->name, "mandelbrot", 10) == 0)
-		draw_mandelbrot(fractol);
-	else if (ft_strncmp(fractol->name, "julia", 5) == 0)
-		draw_julia(fractol);
-	else
-		help(fractol);
+	t_fractol	*fractol;
+
+	fractol = (t_fractol *)param;
+	fractol->x = 0;
+	fractol->y = 0;
+	while (fractol->x < fractol->width)
+	{
+		while (fractol->y < fractol->height)
+		{
+			if (fractol->type == 1)
+				calculate_mandelbrot(fractol);
+			else if (fractol->type == 2)
+				calculate_julia(fractol);
+			else if (fractol->type == 3)
+				calculate_ship(fractol);
+			else
+				help(fractol);
+			fractol->y++;
+		}
+		fractol->x++;
+		fractol->y = 0;
+	}
 	mlx_image_to_window(fractol->mlx, fractol->image, 0, 0);
 	return (0);
 }
 
-int	draw_mandelbrot(void *param)
+void	switch_fractol(t_fractol *fractol)
 {
-	t_fractol	*fractol;
-
-	fractol = (t_fractol *)param;
-	fractol->x = 0;
-	fractol->y = 0;
-	while (fractol->x < fractol->width)
-	{
-		while (fractol->y < fractol->height)
-		{
-			calculate_mandelbrot(fractol);
-			fractol->y++;
-		}
-		fractol->x++;
-		fractol->y = 0;
-	}
-	return (0);
+	if (fractol->type == 3)
+		fractol->type = 1;
+	else
+		fractol->type += 1;
 }
 
-int	draw_julia(void *param)
+void	animation(t_fractol *fractol)
 {
-	t_fractol	*fractol;
+	fractol->jc.real = 0.7788 * cos(fractol->julia_angle);
+	fractol->jc.img = 0.7788 * sin(fractol->julia_angle);
+	fractol->julia_angle += fractol->julia_speed;
+	fractol->needs_redraw = true;
+}
 
-	fractol = (t_fractol *)param;
-	fractol->x = 0;
-	fractol->y = 0;
-	while (fractol->x < fractol->width)
-	{
-		while (fractol->y < fractol->height)
-		{
-			calculate_julia(fractol);
-			fractol->y++;
-		}
-		fractol->x++;
-		fractol->y = 0;
-	}
-	return (0);
+void	change_color(t_fractol *fractol)
+{
+	if (fractol->image)
+		mlx_delete_image(fractol->mlx, fractol->image);
+	fractol->color_shift += 1;
+	if (fractol->color_shift > 8)
+		fractol->color_shift = 1;
+	change_color_in_struct(fractol);
+	fractol->image = mlx_new_image(fractol->mlx, fractol->width,
+			fractol->height);
+	if (!fractol->image)
+		ft_error(fractol);
+	if (mlx_image_to_window(fractol->mlx, fractol->image, 0, 0) < 0)
+		ft_error(fractol);
 }

@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 14:35:59 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/17 23:14:55 by nkuydin          ###   ########.fr       */
+/*   Updated: 2025/10/19 00:36:13 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,23 +21,15 @@ void	init_fractol(t_fractol *fractol)
 	fractol->y = 0;
 	fractol->width = 800;
 	fractol->height = 800;
-	fractol->r = 242;
-	fractol->g = 204;
-	fractol->b = 15;
+	fractol->r = 10;
+	fractol->g = 180;
+	fractol->b = 190;
 	fractol->a = 255;
-	if (strncmp(fractol->name, "mandelbrot", 10) == 0)
-	{
-		fractol->offset_x = -1.90;
-		fractol->offset_y = -1.40;
-		fractol->zoom = 300;
-	}
-	else if (strncmp(fractol->name, "julia", 5) == 0)
-	{
-		fractol->offset_x = -1.60;
-		fractol->offset_y = -1.60;
-		fractol->zoom = 250;
-	}
-	fractol->max_iterations = 150;
+	fractol->max_iterations = 300;
+	fractol->animation = -1;
+	fractol->julia_angle = 0.0;
+	fractol->julia_speed = 0.02;
+	fractol->color_shift = 0;
 }
 
 void	init_mlx(t_fractol *fractol)

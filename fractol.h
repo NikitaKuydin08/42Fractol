@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 16:03:08 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/17 23:54:38 by nkuydin          ###   ########.fr       */
+/*   Updated: 2025/10/19 00:21:03 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@
 
 # define SIZE 800
 
+typedef struct s_complex
+{
+	double	real;
+	double	img;
+}	t_complex;
+
 typedef struct s_fractol
 {
 	void		*mlx;
@@ -29,16 +35,15 @@ typedef struct s_fractol
 	double		zoom;
 	int			x;
 	int			y;
-	double		z_real;
-	double		z_img;
-	double		c_real;
-	double		c_img;
+	t_complex	c;
+	t_complex	z;
+	t_complex	jc;
 	int32_t		width;
 	int32_t		height;
 	double		offset_x;
 	double		offset_y;
 	int			max_iterations;
-	char		*name;
+	int			type;
 	bool		needs_redraw;
 	double		brightness;
 	uint32_t	color;
@@ -46,6 +51,12 @@ typedef struct s_fractol
 	uint8_t		g;
 	uint8_t		b;
 	uint8_t		a;
+	double		param1;
+	double		param2;
+	int			color_shift;
+	int			animation;
+	double		julia_angle;
+	double		julia_speed;
 }	t_fractol;
 
 // init.c
@@ -59,18 +70,21 @@ void	resize_hook(int32_t width, int32_t height, void *param); //Resizing
 void	loop_hook(void *param);
 void	reset_fractol(t_fractol *fractol);
 
+// ship.c
+void	calculate_ship(t_fractol *fractol);
+
 // julia.c
 void	calculate_julia(t_fractol *fractol);
-void	animate_julia(t_fractol *fractol);
+void	check_jc(t_fractol	*fractol);
 
 // mandelbrot.c
 void	calculate_mandelbrot(t_fractol *fractol);
-void	which_colour(t_fractol *fractol, char chr);
 
 // draw.c
-int		draw_mandelbrot(void *param);
-int		draw_julia(void *param);
-int		draw_fractol(t_fractol *fractol);
+int		draw_fractol(t_fractol *param);
+void	switch_fractol(t_fractol *fractol);
+void	animation(t_fractol *fractol);
+void	change_color(t_fractol *fractol);
 
 // main.c
 double	ft_atof(char *nptr);
@@ -79,5 +93,8 @@ double	ft_atof(char *nptr);
 void	help(t_fractol *fractol);
 void	ft_error(t_fractol *fractol);
 void	reset_fractol(t_fractol *fractol);
+
+// color.c
+void	change_color_in_struct(t_fractol	*fractol);
 
 #endif

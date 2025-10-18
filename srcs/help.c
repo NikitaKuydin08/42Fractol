@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 11:14:26 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/17 23:30:44 by nkuydin          ###   ########.fr       */
+/*   Updated: 2025/10/19 00:05:15 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,15 @@ void	reset_fractol(t_fractol *fractol)
 		mlx_delete_image(fractol->mlx, fractol->image);
 		fractol->image = NULL;
 	}
-	if (strncmp(fractol->name, "mandelbrot", 10) == 0)
+	if (fractol->type == 1 || fractol->type == 3)
 	{
 		fractol->offset_x = -1.90;
 		fractol->offset_y = -1.40;
 		fractol->zoom = 300;
 	}
-	else if (strncmp(fractol->name, "julia", 5) == 0)
+	else if (fractol->type == 2)
 	{
+		check_jc(fractol);
 		fractol->offset_x = -1.60;
 		fractol->offset_y = -1.60;
 		fractol->zoom = 250;

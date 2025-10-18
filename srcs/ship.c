@@ -1,25 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mandelbrot.c                                       :+:      :+:    :+:   */
+/*   ship.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/10 20:38:27 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/18 23:56:48 by nkuydin          ###   ########.fr       */
+/*   Created: 2025/10/18 12:33:01 by nkuydin           #+#    #+#             */
+/*   Updated: 2025/10/18 23:56:50 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// Calculates the Mandelbrot fractol for one pixel
 
 #include "../fractol.h"
 
 static void	calculation_colour(t_fractol *fractol, int i);
 
-void	calculate_mandelbrot(t_fractol *fractol)
+void	calculate_ship(t_fractol *fractol)
 {
 	int		n;
-	double	temp_real;
+	double	tmp_real;
 
 	n = 0;
 	fractol->z.real = 0.0;
@@ -28,13 +26,13 @@ void	calculate_mandelbrot(t_fractol *fractol)
 	fractol->c.img = (fractol->y / fractol->zoom) + fractol->offset_y;
 	while (++n < fractol->max_iterations)
 	{
-		temp_real = (fractol->z.real * fractol->z.real)
+		tmp_real = (fractol->z.real * fractol->z.real)
 			- (fractol->z.img * fractol->z.img);
-		fractol->z.img = 2.0 * fractol->z.real * fractol->z.img;
-		fractol->z.real = temp_real + fractol->c.real;
+		fractol->z.img = 2.0 * fabs(fractol->z.real * fractol->z.img);
+		fractol->z.real = tmp_real + fractol->c.real;
 		fractol->z.img += fractol->c.img;
 		if ((fractol->z.real * fractol->z.real
-				+ fractol->z.img * fractol->z.img) > 4)
+				+ fractol->z.img * fractol->z.img) > 10)
 			break ;
 	}
 	if (n == fractol->max_iterations)

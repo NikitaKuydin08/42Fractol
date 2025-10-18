@@ -6,7 +6,7 @@
 /*   By: nkuydin <nkuydin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 19:19:22 by nkuydin           #+#    #+#             */
-/*   Updated: 2025/10/17 23:53:54 by nkuydin          ###   ########.fr       */
+/*   Updated: 2025/10/19 00:06:45 by nkuydin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ int	main(int argc, char **argv)
 	handle_args(fractol, argc, argv);
 	init_fractol(fractol);
 	init_mlx(fractol);
+	check_jc(fractol);
 	draw_fractol(fractol);
 	mlx_key_hook(fractol->mlx, key_hook, fractol);
 	mlx_scroll_hook(fractol->mlx, scroll_hook, fractol);
@@ -90,6 +91,7 @@ double	ft_atof(char *nptr)
 	return (result * is_neg);
 }
 
+
 static void	handle_args(t_fractol *fractol, int argc, char **argv)
 {
 	get_name(fractol, argv);
@@ -101,27 +103,44 @@ static void	handle_args(t_fractol *fractol, int argc, char **argv)
 	}
 	if (argc == 2)
 	{
-		fractol->c_real = -0.7;
-		fractol->c_img = 0.27015;
+		fractol->jc.real = -0.7;
+		fractol->jc.real = 0.27015;
 		return ;
 	}
 	if (argc != 4)
 		help(fractol);
 	if (!ft_strchr(argv[2], '.') || !ft_strchr(argv[3], '.'))
 		help(fractol);
-	fractol->c_real = ft_atof(argv[2]);
-	fractol->c_img = ft_atof(argv[3]);
-	if ((fractol->c_real < -2.0 && fractol->c_real > 2.0)
-		|| (fractol->c_img < -2.0 && fractol->c_img > 2.0))
+	fractol->param1 = ft_atof(argv[2]);
+	fractol->param2 = ft_atof(argv[3]);
+	if ((fractol->param1 < -2.0 && fractol->param1 > 2.0)
+		|| (fractol->param2 < -2.0 && fractol->param2 > 2.0))
 		help(fractol);
 }
 
 static void	get_name(t_fractol *fractol, char **argv)
 {
 	if (strncmp(argv[1], "mandelbrot", 10) == 0)
-		fractol->name = "mandelbrot";
+	{
+		fractol->offset_x = -1.90;
+		fractol->offset_y = -1.40;
+		fractol->zoom = 300;
+		fractol->type = 1;
+	}
 	else if (strncmp(argv[1], "julia", 5) == 0)
-		fractol->name = "julia";
+	{
+		fractol->offset_x = -1.60;
+		fractol->offset_y = -1.60;
+		fractol->zoom = 250;
+		fractol->type = 2;
+	}
+	else if (strncmp(argv[1], "ship", 4) == 0)
+	{
+		fractol->offset_x = -1.90;
+		fractol->offset_y = -1.60;
+		fractol->zoom = 250;
+		fractol->type = 3;
+	}
 	else
 		help(fractol);
 }
